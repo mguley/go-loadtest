@@ -1,0 +1,109 @@
+run:
+  concurrency: 8                # Set concurrency level to 8 for better performance on larger projects by running checks in parallel
+  timeout: 5m                   # Set timeout to 5 minutes to ensure that larger projects have sufficient time to complete the linting process
+  issues-exit-code: 1           # Exit with a code of 1 if there are linter issues, useful for CI/CD pipelines to mark lint errors as build failures
+  go: ""                        # Use the Go version specified in the go.mod file to ensure compatibility
+
+linters:
+  fast: false                   # Run all linters, not just the fast ones; this provides more thorough linting at the cost of time
+  disable-all: true             # Disable all linters by default, only enabling the linters explicitly listed in "enable"
+  enable:
+    # Commonly used linters
+    - govet                    # Analyzes code for common errors, such as incorrect format strings and misaligned struct tags
+    - staticcheck              # Performs advanced static analysis to find bugs, suggest optimizations, and improve code quality
+    - errcheck                 # Ensures that errors returned by functions are not ignored, enforcing proper error handling for robustness
+    - revive                   # Replacement for golint that checks for coding style, naming conventions, and other stylistic issues
+    - unused                   # Finds unused variables, constants, functions, and types, encouraging better code cleanliness
+    - gocritic                 # Suggests best practices and improvements for Go code, such as simplifying complex expressions
+    - ineffassign              # Detects variables assigned values that are never used, indicating potential logic errors
+    - misspell                 # Checks for common spelling errors in comments, strings, and documentation to ensure correctness
+    - typecheck                # Identifies issues related to type conversions and usage, which can catch subtle bugs early
+    - dupl                     # Detects duplicated code to reduce redundancy and improve maintainability
+    - whitespace               # Flags trailing whitespace and inconsistent formatting for clean and standardized code
+    - cyclop                   # Warns when functions have high cyclomatic complexity, promoting simpler, more maintainable functions
+    - nestif                   # Identifies deeply nested if blocks that reduce readability and suggests refactoring
+    - prealloc                 # Suggests preallocating slices when their size is known to improve memory allocation efficiency
+
+    # Additional linters
+    - bodyclose                # Ensures that HTTP response bodies are properly closed, avoiding resource leaks
+    - dogsled                  # Flags the use of too many blank identifiers (`_`) in a single assignment, encouraging better naming
+    - copyloopvar              # Detects capturing loop variables in goroutines, a common source of concurrency bugs
+    - funlen                   # Flags functions that are too long, encouraging modular, easily understandable code
+    - goconst                  # Suggests converting repeated values to constants, improving maintainability and readability
+    - gocyclo                  # Flags functions with high cyclomatic complexity, encouraging simpler code for easier maintenance
+    - gofmt                    # Ensures that code is formatted according to Go's standard format, enforcing a consistent style
+    - goimports                # Checks imports to ensure they are formatted correctly and grouped in the standard way
+    - goprintffuncname         # Checks that `Printf`-like functions are correctly named, preventing incorrect format usage
+    - gosec                    # Finds security-related issues, such as weak cryptographic primitives or potential vulnerabilities
+    - gosimple                 # Suggests simplifying code by removing unnecessary constructs, improving readability
+    - lll                      # Flags lines that exceed a specific length to encourage code readability
+    - nakedret                 # Flags functions that use naked returns, which can make code harder to understand
+    - noctx                    # Ensures that context.Context is used appropriately, especially in functions handling requests
+    - nolintlint               # Checks for proper use of `nolint` comments, encouraging accountability in suppressing lint warnings
+    - unconvert                # Detects redundant type conversions, making code cleaner and easier to understand
+    - unparam                  # Flags unused function parameters, encouraging leaner function signatures without unnecessary inputs
+
+linters-settings:
+  revive:
+    severity: warning                # Set severity to "warning" to make the output less disruptive while still informative
+    ignore-generated-header: true    # Ignore files with a generated code header, avoiding false positives in generated files
+    confidence: 0.8                  # Set the confidence level to 0.8 for rules, balancing between confidence and useful suggestions
+    rules:
+      - name: indent-error-flow      # Enforces error flow indentation to improve readability
+      - name: errorf                 # Checks the use of "fmt.Errorf", encouraging better practices
+      - name: unexported-return      # Warns when unexported types are returned in exported functions
+      - name: error-naming           # Enforces consistent naming conventions for error variables
+      - name: error-return           # Enforces best practices in returning errors from functions
+      - name: empty-lines            # Flags unnecessary empty lines to maintain code compactness
+      - name: empty-block            # Flags empty code blocks, reducing confusion and potential errors
+      - name: context-as-argument    # Encourages passing context explicitly to functions that need it
+      - name: if-return              # Encourages reducing `if` nesting by returning early when possible
+      - name: superfluous-else       # Flags unnecessary `else` statements, suggesting return to simplify code
+
+  gocyclo:
+    min-complexity: 12               # Minimum complexity level for triggering warnings, encouraging simpler code
+
+  nestif:
+    min-complexity: 4                # Maximum allowed nesting depth for `if` statements, promoting readable code
+
+  funlen:
+    lines: 210                       # Maximum number of lines allowed in a function to encourage modular code
+    statements: 200                  # Maximum number of statements allowed in a function
+
+  dupl:
+    threshold: 200                   # Set threshold for duplicated code detection
+
+  misspell:
+    locale: US                       # Set locale to "US" to ensure consistency in spelling
+
+  gocritic:
+    enabled-tags:
+      - diagnostic                   # Enable diagnostic checks to catch subtle bugs
+      - experimental                 # Enable experimental checks to improve code quality
+      - opinionated                  # Enable opinionated checks to enforce best practices
+      - performance                  # Enable performance-related checks to catch potential optimizations
+      - style                        # Enable style-related checks for consistent and readable code
+
+  lll:
+    tab-width: 2                     # Set tab width for the line length check to account for different indentation levels
+    line-length: 120                 # Set the maximum line length to 120 characters for better readability
+
+  nolintlint:
+    allow-unused: false              # Report unused `nolint` directives to ensure there are no accidental suppressions
+    require-explanation: false       # Do not require explanations for `nolint` directives, allowing flexibility
+    require-specific: false          # Do not require `nolint` to be specific to a particular linter, simplifying usage
+
+  staticcheck:
+    checks: ["all"]                  # Enable all available checks provided by `staticcheck`
+
+output:
+  print-issued-lines: true           # Print the line where the issue occurred for easier review
+  print-linter-name: true            # Include the linter name in output for context on each issue
+  uniq-by-line: false                # Do not deduplicate issues by line, ensuring all relevant issues are reported
+  sort-results: true                 # Sort results for easier reading
+
+issues:
+  max-issues-per-linter: 0           # No limit on the number of issues reported per linter
+  max-same-issues: 0                 # No limit on the number of times the same issue can be reported
+  new: false                         # Report both new and existing issues to ensure comprehensive coverage
+  fix: false                         # Do not automatically fix issues, giving developers control over changes
