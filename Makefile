@@ -25,3 +25,14 @@ tidy:
 	done
 	@echo "Vendoring workspace dependencies..."
 	go work vendor
+
+## vet: Run go vet on all Go packages
+SERVICES = pkg examples/nats
+
+.PHONY: vet
+vet:
+	@echo "Running go vet on all microservices..."
+	@for service in $(SERVICES); do \
+		echo "Running go vet in $$service..."; \
+		(cd $$service && go vet ./...); \
+	done
