@@ -166,7 +166,7 @@ func (o *Orchestrator) warmup() error {
 	o.runOperations(warmupCtx, nil)
 	o.logger.Info("Warmup period completed")
 
-	return warmupCtx.Err()
+	return nil
 }
 
 // startProgressReporting spawns a goroutine that periodically reports progress.
