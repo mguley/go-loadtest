@@ -155,30 +155,66 @@ func (m *Metrics) Merge(other *Metrics) {
 		m.EndTime = other.EndTime
 	}
 
-	// Add counters
+	// Add counters.
 	atomic.AddInt64(&m.TotalOperations, atomic.LoadInt64(&other.TotalOperations))
 	atomic.AddInt64(&m.ErrorCount, atomic.LoadInt64(&other.ErrorCount))
 
-	// Merge latencies and custom metrics
+	// Merge latencies and custom metrics.
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	other.mu.Lock()
 	defer other.mu.Unlock()
 
-	// Append latencies
+	// Append latencies.
 	m.Latencies = append(m.Latencies, other.Latencies...)
 
-	// Merge custom metrics (last writer wins for duplicates)
+	// Merge custom metrics (last writer wins for duplicates).
 	for k, v := range other.Custom {
 		m.Custom[k] = v
 	}
 
-	// Recalculate throughput if we have valid time data
+	// Merge resource metrics.
+	m.ResourceMetrics.Merge(&other.ResourceMetrics)
+
+	// Recalculate throughput if we have valid time data.
 	if !m.StartTime.IsZero() && !m.EndTime.IsZero() {
 		duration := m.EndTime.Sub(m.StartTime).Seconds()
 		if duration > 0 {
 			m.Throughput = float64(m.TotalOperations) / duration
 		}
+	}
+}
+
+// Merge combines resource metrics from another ResourceMetrics instance into the current one.
+// For CPUUsagePercent, MemoryUsageMB, and GCPauseMs, if both values are non‑zero, it averages them;
+// otherwise, it takes the non‑zero value. For ActiveGoroutines, it retains the maximum observed value.
+//
+// Parameters:
+//   - other: A pointer to another ResourceMetrics instance to merge.
+func (rm *ResourceMetrics) Merge(other *ResourceMetrics) {
+	switch {
+	case rm.CPUUsagePercent == 0:
+		rm.CPUUsagePercent = other.CPUUsagePercent
+	case other.CPUUsagePercent != 0:
+		rm.CPUUsagePercent = (rm.CPUUsagePercent + other.CPUUsagePercent) / 2
+	}
+
+	switch {
+	case rm.MemoryUsageMB == 0:
+		rm.MemoryUsageMB = other.MemoryUsageMB
+	case other.MemoryUsageMB != 0:
+		rm.MemoryUsageMB = (rm.MemoryUsageMB + other.MemoryUsageMB) / 2
+	}
+
+	switch {
+	case rm.GCPauseMs == 0:
+		rm.GCPauseMs = other.GCPauseMs
+	case other.GCPauseMs != 0:
+		rm.GCPauseMs = (rm.GCPauseMs + other.GCPauseMs) / 2
+	}
+
+	if other.ActiveGoroutines > rm.ActiveGoroutines {
+		rm.ActiveGoroutines = other.ActiveGoroutines
 	}
 }
