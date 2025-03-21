@@ -67,7 +67,7 @@ func NewSystemCollector(logger *slog.Logger) *SystemCollector {
 // Returns:
 //   - error: An error if metrics collection fails to start, otherwise nil.
 func (c *SystemCollector) Start() error {
-	c.logger.Info("Starting system metrics collection", "interval", c.interval)
+	c.logger.Info("Starting system metrics collection", "interval", c.interval.String())
 
 	c.wg.Add(1)
 	go c.collectMetrics()

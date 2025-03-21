@@ -81,7 +81,7 @@ func (o *Orchestrator) Run() error {
 	defer cancel()
 
 	o.logger.Info("Starting load test",
-		"duration", o.config.TestDuration,
+		"duration", o.config.TestDuration.String(),
 		"concurrency", o.config.Concurrency,
 		"runners", len(o.runners),
 		"collectors", len(o.collectors),
@@ -158,7 +158,7 @@ func (o *Orchestrator) warmup() error {
 		return nil
 	}
 
-	o.logger.Info("Starting warmup period", "duration", o.config.WarmupDuration)
+	o.logger.Info("Starting warmup period", "duration", o.config.WarmupDuration.String())
 	warmupCtx, warmupCancel := context.WithTimeout(context.Background(), o.config.WarmupDuration)
 	defer warmupCancel()
 
@@ -239,8 +239,10 @@ func (o *Orchestrator) collectData(metrics *core.Metrics) {
 		}
 	}
 
+	d := metrics.EndTime.Sub(metrics.StartTime)
+	formatted := fmt.Sprintf("%d minutes %d seconds", int(d.Minutes()), int(d.Seconds())%60)
 	o.logger.Info("Load test completed successfully",
-		"duration", metrics.EndTime.Sub(metrics.StartTime),
+		"duration", formatted,
 		"operations", metrics.TotalOperations,
 		"errors", metrics.ErrorCount,
 		"throughput", metrics.Throughput)

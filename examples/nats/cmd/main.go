@@ -69,9 +69,9 @@ func main() {
 		slog.String("test_type", cfg.TestType),
 		slog.String("subject", cfg.Subject),
 		slog.Int("concurrency", cfg.Concurrency),
-		slog.Any("duration", cfg.Duration))
+		slog.Any("duration", cfg.Duration.String()))
 
-	if err := orchestrator.Run(); err != nil {
+	if err = orchestrator.Run(); err != nil {
 		logger.Error("Load test failed", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
