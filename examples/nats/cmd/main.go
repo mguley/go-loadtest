@@ -60,7 +60,7 @@ func main() {
 
 	if cfg.OutputPath != "" {
 		jsonReporter := reporter.NewJSONReporter(cfg.OutputPath)
-		jsonReporter.SetIncludeLatencies(true)
+		jsonReporter.SetIncludeLatencies(false)
 		orchestrator.AddReporter(jsonReporter)
 	}
 

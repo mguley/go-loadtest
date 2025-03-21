@@ -146,6 +146,7 @@ func (c *SystemCollector) collectMetrics() {
 		case <-c.ctx.Done():
 			return
 		case <-ticker.C:
+			runtime.GC()
 			var m runtime.MemStats
 			runtime.ReadMemStats(&m)
 
