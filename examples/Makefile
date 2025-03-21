@@ -66,7 +66,12 @@ run/long-duration:
 # DOCKER
 # =============================================================================== #
 
-## docker/nats: Start a NATS server in Docker for testing
-.PHONY: docker/nats
-docker/nats:
+## docker/start: Start a NATS server in Docker for testing
+.PHONY: docker/start
+docker/start:
 	docker run -d --name nats-server -p 4222:4222 -p 8222:8222 nats
+
+## docker/stop: Stop and remove the NATS server container
+.PHONY: docker/stop
+docker/stop:
+	docker stop nats-server && docker rm nats-server
