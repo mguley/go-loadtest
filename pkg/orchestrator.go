@@ -256,7 +256,7 @@ func (o *Orchestrator) collectData(metrics *core.Metrics) {
 		"duration", formatted,
 		"operations", metrics.TotalOperations,
 		"errors", metrics.ErrorCount,
-		"throughput", metrics.Throughput)
+		"throughput", fmt.Sprintf("%.0f ops/s", metrics.Throughput))
 }
 
 // runOperations executes the test operations using the configured runners.
@@ -342,7 +342,7 @@ func (o *Orchestrator) reportProgress(ctx context.Context, interval time.Duratio
 }
 
 // collectMetricsSnapshot gathers current metrics from all collectors and merges them into the provided baseMetrics.
-// If there is exactly one registered collector and it is a CompositeCollector, its snapshot is returned directly.
+// If there is exactly one registered collector, and it is a CompositeCollector, its snapshot is returned directly.
 //
 // Parameters:
 //   - baseMetrics: Pointer to core.Metrics to use as the accumulator for merging.

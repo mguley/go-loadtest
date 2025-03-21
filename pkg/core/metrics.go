@@ -143,13 +143,15 @@ func (m *Metrics) GetSnapshot() *MetricsSnapshot {
 // Parameters:
 //   - other: A pointer to another Metrics instance to merge.
 func (m *Metrics) Merge(other *Metrics) {
-	// Only update start time if it's earlier
-	if other.StartTime.Before(m.StartTime) || m.StartTime.IsZero() {
-		m.StartTime = other.StartTime
+	// If the other has a non-zero start time, and it's earlier than the current start time.
+	if !other.StartTime.IsZero() {
+		if m.StartTime.IsZero() || other.StartTime.Before(m.StartTime) {
+			m.StartTime = other.StartTime
+		}
 	}
 
-	// Only update end time if it's later
-	if other.EndTime.After(m.EndTime) {
+	// If the other has a non-zero end time, and it's later than the current end time.
+	if !other.EndTime.IsZero() && other.EndTime.After(m.EndTime) {
 		m.EndTime = other.EndTime
 	}
 

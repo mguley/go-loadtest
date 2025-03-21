@@ -3,6 +3,7 @@ package reporter
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/mguley/go-loadtest/pkg/core"
@@ -166,6 +167,10 @@ func (r *JSONReporter) ReportResults(metrics *core.Metrics) error {
 
 	// Write to file if path is specified, otherwise return without error
 	if r.outputPath != "" {
+		dir := filepath.Dir(r.outputPath)
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			return err
+		}
 		return os.WriteFile(r.outputPath, jsonData, 0o600)
 	}
 
